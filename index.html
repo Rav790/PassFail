@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Previous head section remains the same -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Pass/Fail Calculator</title>
+    <style>
+        /* Previous styles remain the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .course-type {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .course-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #007bff;
+            background: none;
+            color: #007bff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .course-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .check-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+
+        .check-button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result {
+            padding: 20px;
+            border-radius: 4px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .marks {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            font-size: 16px;
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .fail-reasons {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fff5f5;
+            border-left: 4px solid #dc3545;
+            text-align: left;
+            font-size: 14px;
+            color: #721c24;
+        }
+
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Pass/Fail Calculator</h1>
+        
+        <div class="course-type">
+            <button class="course-btn active" data-type="theory">Theory</button>
+            <button class="course-btn" data-type="practical">Practical</button>
+        </div>
+
+        <form id="gradeForm">
+            <div class="form-group">
+                <label for="attendance">Attendance Marks :</label>
+                <input type="number" id="attendance" min="0" max="100" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ca">Continuous Assessment Marks:</label>
+                <input type="number" id="ca" min="0" max="100" required>
+            </div>
+
+            <div class="form-group theory-only">
+                <label for="mtt">Mid Term Test (MTT) Marks :</label>
+                <input type="number" id="mtt" min="0" max="100" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ete">End Term Exam (ETE) Marks :</label>
+                <input type="number" id="ete" min="0" max="100" required>
+            </div>
+
+            <button type="button" class="check-button" id="checkResult">Check Result</button>
+        </form>
+
+        <div id="resultContainer" class="result-container">
+            <div id="result" class="result"></div>
+            <div id="marks" class="marks"></div>
+            <div id="failReasons" class="fail-reasons" style="display: none;"></div>
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        
+        const form = document.getElementById('gradeForm');
+        const courseButtons = document.querySelectorAll('.course-btn');
+        const theoryOnly = document.querySelector('.theory-only');
+        const resultContainer = document.getElementById('resultContainer');
+        const failReasons = document.getElementById('failReasons');
+        const checkButton = document.getElementById('checkResult');
+
+        const passMessages = [
+            "Wahh bhai wahh! 🎉 Pass ho gya" ,
+            "Wahh bhai wahh! 🎉 Pass ho gya 🎓",
+            "Your parents can finally stop worrying! 😌",
+            "350 bach gye bhai 🌟",
+            "You're officially smarter than your cat now! 🐱"
+        ];
+
+        const failMessages = [
+            "haan bhai tu wahi hai n jo din bhar DL k jugad me rahta hai 📚",
+            "Or dekh raat bhar reels RE to ayga hi 😅",
+            "350 ka jugad kr bhai 💡",
+            "haa bhai tu hi bolta tha n , jo hoga dekha jayga, ab dekh 🎬",
+            "or ghum bhai Robo-Park me! 🌍"
+        ];
+
+        
+        courseButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                courseButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                if (button.dataset.type === 'practical') {
+                    theoryOnly.style.display = 'none';
+                    document.getElementById('mtt').required = false;
+                } else {
+                    theoryOnly.style.display = 'block';
+                    document.getElementById('mtt').required = true;
+                }
+            });
+        });
+
+        function getRandomMessage(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        checkButton.addEventListener('click', calculateResult);
+
+        function calculateResult() {
+            const courseType = document.querySelector('.course-btn.active').dataset.type;
+            const values = {
+                attendance: parseFloat(document.getElementById('attendance').value) || 0,
+                ca: parseFloat(document.getElementById('ca').value) || 0,
+                mtt: courseType === 'theory' ? (parseFloat(document.getElementById('mtt').value) || 0) : 0,
+                ete: parseFloat(document.getElementById('ete').value) || 0
+            };
+
+            const totalMarks = values.attendance + values.ca + values.mtt + values.ete;
+            const isOverallPassing = totalMarks >= 40;
+            let passed = false;
+            let failReasonsList = [];
+            let requiredMarks = '';
+
+            if (!isOverallPassing) {
+                const marksNeededForOverall = Math.ceil(40 - (values.attendance + values.ca + values.mtt));
+                failReasonsList.push(`• Overall marks (${totalMarks.toFixed(1)}%) are below required 40%`);
+            }
+
+            if (courseType === 'theory') {
+                const mttEteCombined = values.mtt + values.ete;
+                const etePass = values.ete >= 30;
+                const combinedPass = mttEteCombined >= 30;
+
+                if (!etePass && !combinedPass) {
+                    failReasonsList.push(`• Neither Your ETE marks (${values.ete}%) reach 30% nor your MTT+ETE combined (${mttEteCombined}%) reach 30%`);
+                    
+                    
+                    const marksNeededForETE = Math.max(30 - values.ete, 0);
+                    const marksNeededForCombined = Math.max(30 - mttEteCombined, 0);
+                    
+                    requiredMarks = `To pass, you need either:<br>
+                    • ${marksNeededForETE.toFixed(1)}% more in ETE to reach 30%<br>
+                    <br>
+                    • ${marksNeededForCombined.toFixed(1)}% more in ETE to reach combined 30% with MTT`;
+                }
+
+                passed = isOverallPassing && (etePass || combinedPass);
+            } else {
+                if (values.ete < 30) {
+                    failReasonsList.push(`• Your ETE marks (${values.ete}%) are below required 30%`);
+                    
+                    
+                    const marksNeededForETE = Math.max(30 - values.ete, 0);
+                    requiredMarks = `To pass, you need:<br>
+                    • ${marksNeededForETE.toFixed(1)}% more in ETE to reach 30%`;
+                }
+                passed = isOverallPassing && values.ete >= 30;
+            }
+
+           
+            if (!isOverallPassing) {
+                const marksNeededForOverall = Math.ceil(40 - (values.attendance + values.ca + values.mtt));
+                requiredMarks += `${requiredMarks ? '<br><br>' : ''}• You also need at least ${marksNeededForOverall}% in ETE to reach overall 40%`;
+            }
+
+        
+            resultContainer.style.display = 'block';
+            
+           
+            document.getElementById('result').textContent = passed ? 'PASSED! 🎉' : 'FAILED 😢';
+            document.getElementById('result').className = 'result ' + (passed ? 'pass' : 'fail');
+            document.getElementById('marks').textContent = `Total Marks: ${totalMarks.toFixed(1)}%`;
+            
+          
+            if (!passed) {
+                failReasons.style.display = 'block';
+                failReasons.innerHTML = `
+                    <strong>Reasons for Failure:</strong><br>
+                    ${failReasonsList.join('<br>')}
+                    ${requiredMarks ? '<br><br><strong>What you need to pass:</strong><br>' + requiredMarks : ''}
+                `;
+            } else {
+                failReasons.style.display = 'none';
+            }
+            
+            document.getElementById('message').textContent = passed ? 
+                getRandomMessage(passMessages) : 
+                getRandomMessage(failMessages);
+        }
+    </script>
+</body>
+</html>
