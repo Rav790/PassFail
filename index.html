@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Previous head section remains the same -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Pass/Fail Calculator</title>
     <style>
-        /* Previous styles remain the same */
         * {
             margin: 0;
             padding: 0;
@@ -38,6 +36,25 @@
             margin-bottom: 15px;
         }
 
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .input-group span {
+            color: #666;
+            white-space: nowrap;
+        }
+
         .course-type {
             display: flex;
             gap: 10px;
@@ -67,14 +84,6 @@
             font-weight: bold;
         }
 
-        select, input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
         .check-button {
             width: 100%;
             padding: 12px;
@@ -95,7 +104,7 @@
 
         .result-container {
             display: none;
-            margin-top: 20px;
+            margin: 20px 0;
             text-align: center;
         }
 
@@ -129,20 +138,52 @@
             color: #721c24;
         }
 
-        .pass {
-            background-color: #d4edda;
-            color: #155724;
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        
+        .example-containerX {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            border-radius: 5px;
         }
 
-        .fail {
-            background-color: #f8d7da;
-            color: #721c24;
+        .example-containerX h2 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .example-containerX p {
+            margin: 5px 0;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #fb0c0c;
+        }
+
+        .example-image {
+            display: block;
+            margin: 10px auto;
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        ol {
+            padding-left: 20px;
+        }
+
+        ol li {
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Student Pass/Fail Calculator</h1>
+        <h1>Student Grade Calculator</h1>
         
         <div class="course-type">
             <button class="course-btn active" data-type="theory">Theory</button>
@@ -151,38 +192,81 @@
 
         <form id="gradeForm">
             <div class="form-group">
-                <label for="attendance">Attendance Marks :</label>
-                <input type="number" id="attendance" min="0" max="100" required>
+                <label for="attendance">Attendance Marks:</label>
+                <div class="input-group">
+                    <input type="number" id="attendance" min="0" required>
+                    <span>out of</span>
+                    <input type="number" id="attendance_max" min="1" value="5" required>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="ca">Continuous Assessment Marks:</label>
-                <input type="number" id="ca" min="0" max="100" required>
+                <div class="input-group">
+                    <input type="number" id="ca" min="0" required>
+                    <span>out of</span>
+                    <input type="number" id="ca_max" min="1" value="25" required>
+                </div>
             </div>
 
             <div class="form-group theory-only">
-                <label for="mtt">Mid Term Test (MTT) Marks :</label>
-                <input type="number" id="mtt" min="0" max="100" required>
+                <label for="mtt">Mid Term Test (MTT) Marks:</label>
+                <div class="input-group">
+                    <input type="number" id="mtt" min="0" required>
+                    <span>out of</span>
+                    <input type="number" id="mtt_max" min="1" value="20" required>
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="ete">End Term Exam (ETE) Marks :</label>
-                <input type="number" id="ete" min="0" max="100" required>
+                <label for="ete">End Term Exam (ETE) Marks:</label>
+                <div class="input-group">
+                    <input type="number" id="ete" min="0" required>
+                    <span>out of</span>
+                    <input type="number" id="ete_max" min="1" value="50" required>
+                </div>
             </div>
 
             <button type="button" class="check-button" id="checkResult">Check Result</button>
         </form>
 
+        
         <div id="resultContainer" class="result-container">
             <div id="result" class="result"></div>
             <div id="marks" class="marks"></div>
             <div id="failReasons" class="fail-reasons" style="display: none;"></div>
             <div id="message" class="message"></div>
         </div>
+
+        <div id="theoryExample" class="example-containerX">
+            <h2>Example: How to Use the Calculator (Theory Subject)</h2>
+            <p><span class="highlight">Consider the marks which is highlighted in a red box in the provided screenshot.</span></p>
+            <img src="theory.jpg" alt="Theory Marks Example" class="example-image">
+            <p>To calculate the final weighted score:</p>
+            <ol>
+                <li>Enter <span class="highlight">5</span> in the "Attendance Marks" field and <span class="highlight">5</span> in the "Out of" field.</li>
+                <li>Enter <span class="highlight">34</span> in the "Continuous Assessment" field and <span class="highlight">40</span> in the "Out of" field.</li>
+                <li>Enter <span class="highlight">12</span> in the "Mid Term Test" field and <span class="highlight">20</span> in the "Out of" field.</li>
+                <li>Enter <span class="highlight">9</span> in the "End Term Exam" field and <span class="highlight">30</span> in the "Out of" field.</li>
+            </ol>
+            <p>Click <b>"Check Result"</b> to see your final score and pass/fail status.</p>
+        </div>
+        
+        <div id="practicalExample" class="example-containerX" style="display: none;">
+            <h2>Example: How to Use the Calculator (Practical Subject)</h2>
+            <p><span class="highlight">Consider the marks which is highlighted in a red box in the provided screenshot.</span></p>
+            <img src="practical.jpg" alt="Practical Marks Example" class="example-image">
+            <p>To calculate the final weighted score:</p>
+            <ol>
+                <li>Enter <span class="highlight">5</span> in the "Attendance Marks" field and <span class="highlight">5</span> in the "Out of" field.</li>
+                <li>Enter <span class="highlight">28</span> in the "Continuous Assessment" field and <span class="highlight">50</span> in the "Out of" field.</li>
+                <li>Enter <span class="highlight">24</span> in the "End Term Exam" field and <span class="highlight">45</span> in the "Out of" field.</li>
+            </ol>
+            <p>Click <b>"Check Result"</b> to see your final score and pass/fail status.</p>
+        </div>
     </div>
 
     <script>
-        
         const form = document.getElementById('gradeForm');
         const courseButtons = document.querySelectorAll('.course-btn');
         const theoryOnly = document.querySelector('.theory-only');
@@ -191,123 +275,176 @@
         const checkButton = document.getElementById('checkResult');
 
         const passMessages = [
-            "Wahh bhai wahh! 🎉 Pass ho gya" ,
-            "Wahh bhai wahh! 🎉 Pass ho gya 🎓",
-            "Your parents can finally stop worrying! 😌",
-            "350 bach gye bhai 🌟",
-            "You're officially smarter than your cat now! 🐱"
+            "Excellent work! 🎉",
+            "You've made it! 🎓",
+            "Success achieved! 🌟",
+            "Great job passing! 😊",
+            "Congratulations! 🎊"
         ];
 
         const failMessages = [
-            "haan bhai tu wahi hai n jo din bhar DL k jugad me rahta hai 📚",
-            "Or dekh raat bhar reels RE to ayga hi 😅",
-            "350 ka jugad kr bhai 💡",
-            "haa bhai tu hi bolta tha n , jo hoga dekha jayga, ab dekh 🎬",
-            "or ghum bhai Robo-Park me! 🌍"
+            "Keep working hard! 📚",
+            "Don't give up! 💪",
+            "Try again - you can do it! 🎯",
+            "Focus on improvement! 📝",
+            "Stay determined! 💡"
         ];
-
-        
         courseButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                courseButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                if (button.dataset.type === 'practical') {
-                    theoryOnly.style.display = 'none';
-                    document.getElementById('mtt').required = false;
-                } else {
-                    theoryOnly.style.display = 'block';
-                    document.getElementById('mtt').required = true;
-                }
-            });
-        });
-
+    button.addEventListener('click', () => {
+       
+        courseButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+       
+        document.getElementById('attendance').value = '';
+        document.getElementById('ca').value = '';
+        document.getElementById('mtt').value = '';
+        document.getElementById('ete').value = '';
+        
+        
+        resultContainer.style.display = 'none';
+        
+        
+        if (button.dataset.type === 'practical') {
+          
+            document.getElementById('attendance_max').value = '5';
+            document.getElementById('ca_max').value = '50';
+            document.getElementById('ete_max').value = '45';
+            theoryOnly.style.display = 'none';
+            document.getElementById('mtt').required = false;
+            
+            
+            document.getElementById('practicalExample').style.display = 'block';
+            document.getElementById('theoryExample').style.display = 'none';
+        } else {
+            
+            document.getElementById('attendance_max').value = '5';
+            document.getElementById('ca_max').value = '25';
+            document.getElementById('mtt_max').value = '20';
+            document.getElementById('ete_max').value = '50';
+            theoryOnly.style.display = 'block';
+            document.getElementById('mtt').required = true;
+            
+            
+            document.getElementById('practicalExample').style.display = 'none';
+            document.getElementById('theoryExample').style.display = 'block';
+        }
+    });
+});
         function getRandomMessage(array) {
             return array[Math.floor(Math.random() * array.length)];
         }
 
-        checkButton.addEventListener('click', calculateResult);
-
         function calculateResult() {
             const courseType = document.querySelector('.course-btn.active').dataset.type;
-            const values = {
+            
+            const maxMarks = {
+                attendance: parseFloat(document.getElementById('attendance_max').value) || 5,
+                ca: parseFloat(document.getElementById('ca_max').value) || 25,
+                mtt: parseFloat(document.getElementById('mtt_max').value) || 20,
+                ete: parseFloat(document.getElementById('ete_max').value) || 50
+            };
+
+            const totalMaxMarks = maxMarks.attendance + maxMarks.ca + 
+                (courseType === 'theory' ? maxMarks.mtt : 0) + maxMarks.ete;
+
+            const rawValues = {
                 attendance: parseFloat(document.getElementById('attendance').value) || 0,
                 ca: parseFloat(document.getElementById('ca').value) || 0,
                 mtt: courseType === 'theory' ? (parseFloat(document.getElementById('mtt').value) || 0) : 0,
                 ete: parseFloat(document.getElementById('ete').value) || 0
             };
 
-            const totalMarks = values.attendance + values.ca + values.mtt + values.ete;
+            const values = {
+                attendance: (rawValues.attendance / maxMarks.attendance) * 100,
+                ca: (rawValues.ca / maxMarks.ca) * 100,
+                mtt: courseType === 'theory' ? (rawValues.mtt / maxMarks.mtt) * 100 : 0,
+                ete: (rawValues.ete / maxMarks.ete) * 100
+            };
+
+            const weightedValues = {
+                attendance: values.attendance * (maxMarks.attendance / totalMaxMarks),
+                ca: values.ca * (maxMarks.ca / totalMaxMarks),
+                mtt: values.mtt * (maxMarks.mtt / totalMaxMarks),
+                ete: values.ete * (maxMarks.ete / totalMaxMarks)
+            };
+
+            const totalMarks = weightedValues.attendance + weightedValues.ca + 
+                weightedValues.mtt + weightedValues.ete;
+            
             const isOverallPassing = totalMarks >= 40;
             let passed = false;
             let failReasonsList = [];
             let requiredMarks = '';
 
             if (!isOverallPassing) {
-                const marksNeededForOverall = Math.ceil(40 - (values.attendance + values.ca + values.mtt));
                 failReasonsList.push(`• Overall marks (${totalMarks.toFixed(1)}%) are below required 40%`);
             }
 
             if (courseType === 'theory') {
-                const mttEteCombined = values.mtt + values.ete;
                 const etePass = values.ete >= 30;
+                const mttEteCombined = (values.mtt + values.ete) / 2;
                 const combinedPass = mttEteCombined >= 30;
 
                 if (!etePass && !combinedPass) {
-                    failReasonsList.push(`• Neither Your ETE marks (${values.ete}%) reach 30% nor your MTT+ETE combined (${mttEteCombined}%) reach 30%`);
-                    
+                    failReasonsList.push(
+                        `• Neither ETE marks (${values.ete.toFixed(1)}%) reach 30% nor ` +
+                        `MTT+ETE combined (${mttEteCombined.toFixed(1)}%) reach 30%`
+                    );
                     
                     const marksNeededForETE = Math.max(30 - values.ete, 0);
-                    const marksNeededForCombined = Math.max(30 - mttEteCombined, 0);
+                    const actualEteMarksNeeded = (marksNeededForETE * maxMarks.ete) / 100;
                     
                     requiredMarks = `To pass, you need either:<br>
-                    • ${marksNeededForETE.toFixed(1)}% more in ETE to reach 30%<br>
-                    <br>
-                    • ${marksNeededForCombined.toFixed(1)}% more in ETE to reach combined 30% with MTT`;
+                    • ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete})<br>
+                    OR<br>
+                    • Improve MTT+ETE combined score to reach 30%`;
                 }
 
                 passed = isOverallPassing && (etePass || combinedPass);
             } else {
                 if (values.ete < 30) {
-                    failReasonsList.push(`• Your ETE marks (${values.ete}%) are below required 30%`);
-                    
+                    failReasonsList.push(`• ETE marks (${values.ete.toFixed(1)}%) are below required 30%`);
                     
                     const marksNeededForETE = Math.max(30 - values.ete, 0);
+                    const actualEteMarksNeeded = (marksNeededForETE * maxMarks.ete) / 100;
                     requiredMarks = `To pass, you need:<br>
-                    • ${marksNeededForETE.toFixed(1)}% more in ETE to reach 30%`;
+                    • ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete})`;
                 }
                 passed = isOverallPassing && values.ete >= 30;
             }
 
-           
             if (!isOverallPassing) {
-                const marksNeededForOverall = Math.ceil(40 - (values.attendance + values.ca + values.mtt));
-                requiredMarks += `${requiredMarks ? '<br><br>' : ''}• You also need at least ${marksNeededForOverall}% in ETE to reach overall 40%`;
+                const neededOverall = 40 - totalMarks;
+                const actualEteMarksNeeded = ((neededOverall * maxMarks.ete) / 
+                    (maxMarks.ete / totalMaxMarks))/100;
+                requiredMarks += `${requiredMarks ? '<br><br>' : ''}
+                • You need ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete}) 
+                to reach overall 40%`;
             }
 
-        
             resultContainer.style.display = 'block';
-            
-           
             document.getElementById('result').textContent = passed ? 'PASSED! 🎉' : 'FAILED 😢';
             document.getElementById('result').className = 'result ' + (passed ? 'pass' : 'fail');
             document.getElementById('marks').textContent = `Total Marks: ${totalMarks.toFixed(1)}%`;
             
-          
             if (!passed) {
                 failReasons.style.display = 'block';
                 failReasons.innerHTML = `
                     <strong>Reasons for Failure:</strong><br>
                     ${failReasonsList.join('<br>')}
-                    ${requiredMarks ? '<br><br><strong>What you need to pass:</strong><br>' + requiredMarks : ''}
+                    ${requiredMarks ? '<br><br><strong>What you need to pass:</strong><br>' + 
+                    requiredMarks : ''}
                 `;
             } else {
                 failReasons.style.display = 'none';
             }
-            
             document.getElementById('message').textContent = passed ? 
                 getRandomMessage(passMessages) : 
                 getRandomMessage(failMessages);
         }
+
+        checkButton.addEventListener('click', calculateResult);
     </script>
 </body>
 </html>
