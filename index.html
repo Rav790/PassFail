@@ -209,6 +209,15 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label for="ete">End Term Exam (ETE) Marks:</label>
+                <div class="input-group">
+                    <input type="number" id="ete" min="0" required>
+                    <span>out of</span>
+                    <input type="number" id="ete_max" min="1" value="50" required>
+                </div>
+            </div>
+
             <div class="form-group theory-only">
                 <label for="mtt">Mid Term Test (MTT) Marks:</label>
                 <div class="input-group">
@@ -218,14 +227,7 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="ete">End Term Exam (ETE) Marks:</label>
-                <div class="input-group">
-                    <input type="number" id="ete" min="0" required>
-                    <span>out of</span>
-                    <input type="number" id="ete_max" min="1" value="50" required>
-                </div>
-            </div>
+            
 
             <button type="button" class="check-button" id="checkResult">Check Result</button>
         </form>
