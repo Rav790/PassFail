@@ -267,184 +267,182 @@
     </div>
 
     <script>
-        const form = document.getElementById('gradeForm');
-        const courseButtons = document.querySelectorAll('.course-btn');
-        const theoryOnly = document.querySelector('.theory-only');
-        const resultContainer = document.getElementById('resultContainer');
-        const failReasons = document.getElementById('failReasons');
-        const checkButton = document.getElementById('checkResult');
+        document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('gradeForm');
+    const courseButtons = document.querySelectorAll('.course-btn');
+    const theoryOnly = document.querySelector('.theory-only');
+    const resultContainer = document.getElementById('resultContainer');
+    const failReasons = document.getElementById('failReasons');
+    const checkButton = document.getElementById('checkResult');
 
-        const passMessages = [
-            "Excellent work! 🎉",
-            "You've made it! 🎓",
-            "Success achieved! 🌟",
-            "Great job passing! 😊",
-            "Congratulations! 🎊"
-        ];
+    const passMessages = [
+        "Excellent work! 🎉",
+        "You've made it! 🎓",
+        "Success achieved! 🌟",
+        "Great job passing! 😊",
+        "Congratulations! 🎊"
+    ];
 
-        const failMessages = [
-            "Keep working hard! 📚",
-            "Don't give up! 💪",
-            "Try again - you can do it! 🎯",
-            "Focus on improvement! 📝",
-            "Stay determined! 💡"
-        ];
-        courseButtons.forEach(button => {
-    button.addEventListener('click', () => {
-       
-        courseButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        
-       
-        document.getElementById('attendance').value = '';
-        document.getElementById('ca').value = '';
-        document.getElementById('mtt').value = '';
-        document.getElementById('ete').value = '';
-        
-        
-        resultContainer.style.display = 'none';
-        
-        
-        if (button.dataset.type === 'practical') {
-          
-            document.getElementById('attendance_max').value = '5';
-            document.getElementById('ca_max').value = '50';
-            document.getElementById('ete_max').value = '45';
-            theoryOnly.style.display = 'none';
-            document.getElementById('mtt').required = false;
+    const failMessages = [
+        "Keep working hard! 📚",
+        "Don't give up! 💪",
+        "Try again - you can do it! 🎯",
+        "Focus on improvement! 📝",
+        "Stay determined! 💡"
+    ];
+
+    courseButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            courseButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
             
+            document.getElementById('attendance').value = '';
+            document.getElementById('ca').value = '';
+            document.getElementById('mtt').value = '';
+            document.getElementById('ete').value = '';
             
-            document.getElementById('practicalExample').style.display = 'block';
-            document.getElementById('theoryExample').style.display = 'none';
-        } else {
+            resultContainer.style.display = 'none';
             
-            document.getElementById('attendance_max').value = '5';
-            document.getElementById('ca_max').value = '25';
-            document.getElementById('mtt_max').value = '20';
-            document.getElementById('ete_max').value = '50';
-            theoryOnly.style.display = 'block';
-            document.getElementById('mtt').required = true;
-            
-            
-            document.getElementById('practicalExample').style.display = 'none';
-            document.getElementById('theoryExample').style.display = 'block';
-        }
+            if (button.dataset.type === 'practical') {
+                document.getElementById('attendance_max').value = '5';
+                document.getElementById('ca_max').value = '50';
+                document.getElementById('ete_max').value = '45';
+                theoryOnly.style.display = 'none';
+                document.getElementById('mtt').required = false;
+                
+                document.getElementById('practicalExample').style.display = 'block';
+                document.getElementById('theoryExample').style.display = 'none';
+            } else {
+                document.getElementById('attendance_max').value = '5';
+                document.getElementById('ca_max').value = '25';
+                document.getElementById('mtt_max').value = '20';
+                document.getElementById('ete_max').value = '50';
+                theoryOnly.style.display = 'block';
+                document.getElementById('mtt').required = true;
+                
+                document.getElementById('practicalExample').style.display = 'none';
+                document.getElementById('theoryExample').style.display = 'block';
+            }
+        });
     });
-});
-        function getRandomMessage(array) {
-            return array[Math.floor(Math.random() * array.length)];
+
+    function getRandomMessage(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function calculateResult() {
+        const courseType = document.querySelector('.course-btn.active').dataset.type;
+        
+        const maxMarks = {
+            attendance: parseFloat(document.getElementById('attendance_max').value) || 5,
+            ca: parseFloat(document.getElementById('ca_max').value) || 25,
+            mtt: parseFloat(document.getElementById('mtt_max').value) || 20,
+            ete: parseFloat(document.getElementById('ete_max').value) || 50
+        };
+
+        const totalMaxMarks = maxMarks.attendance + maxMarks.ca + 
+            (courseType === 'theory' ? maxMarks.mtt : 0) + maxMarks.ete;
+
+        const rawValues = {
+            attendance: parseFloat(document.getElementById('attendance').value) || 0,
+            ca: parseFloat(document.getElementById('ca').value) || 0,
+            mtt: courseType === 'theory' ? (parseFloat(document.getElementById('mtt').value) || 0) : 0,
+            ete: parseFloat(document.getElementById('ete').value) || 0
+        };
+
+        const values = {
+            attendance: (rawValues.attendance / maxMarks.attendance) * 100,
+            ca: (rawValues.ca / maxMarks.ca) * 100,
+            mtt: courseType === 'theory' ? (rawValues.mtt / maxMarks.mtt) * 100 : 0,
+            ete: (rawValues.ete / maxMarks.ete) * 100
+        };
+
+        const weightedValues = {
+            attendance: values.attendance * (maxMarks.attendance / totalMaxMarks),
+            ca: values.ca * (maxMarks.ca / totalMaxMarks),
+            mtt: values.mtt * (maxMarks.mtt / totalMaxMarks),
+            ete: values.ete * (maxMarks.ete / totalMaxMarks)
+        };
+
+        const totalMarks = weightedValues.attendance + weightedValues.ca + 
+            weightedValues.mtt + weightedValues.ete;
+        
+        let passed = false;
+        let failReasonsList = [];
+        let requiredMarks = '';
+
+        if (totalMarks < 40) {
+            failReasonsList.push(`• Overall marks (${totalMarks.toFixed(1)}%) are below required 40%`);
         }
 
-        function calculateResult() {
-            const courseType = document.querySelector('.course-btn.active').dataset.type;
+        if (courseType === 'theory') {
+            const etePass = values.ete >= 30;
             
-            const maxMarks = {
-                attendance: parseFloat(document.getElementById('attendance_max').value) || 5,
-                ca: parseFloat(document.getElementById('ca_max').value) || 25,
-                mtt: parseFloat(document.getElementById('mtt_max').value) || 20,
-                ete: parseFloat(document.getElementById('ete_max').value) || 50
-            };
+            const mttEteCombinedPercentage = 
+                ((rawValues.mtt + rawValues.ete) / (maxMarks.mtt + maxMarks.ete)) * 100;
+            const combinedPass = mttEteCombinedPercentage >= 30;
 
-            const totalMaxMarks = maxMarks.attendance + maxMarks.ca + 
-                (courseType === 'theory' ? maxMarks.mtt : 0) + maxMarks.ete;
-
-            const rawValues = {
-                attendance: parseFloat(document.getElementById('attendance').value) || 0,
-                ca: parseFloat(document.getElementById('ca').value) || 0,
-                mtt: courseType === 'theory' ? (parseFloat(document.getElementById('mtt').value) || 0) : 0,
-                ete: parseFloat(document.getElementById('ete').value) || 0
-            };
-
-            const values = {
-                attendance: (rawValues.attendance / maxMarks.attendance) * 100,
-                ca: (rawValues.ca / maxMarks.ca) * 100,
-                mtt: courseType === 'theory' ? (rawValues.mtt / maxMarks.mtt) * 100 : 0,
-                ete: (rawValues.ete / maxMarks.ete) * 100
-            };
-
-            const weightedValues = {
-                attendance: values.attendance * (maxMarks.attendance / totalMaxMarks),
-                ca: values.ca * (maxMarks.ca / totalMaxMarks),
-                mtt: values.mtt * (maxMarks.mtt / totalMaxMarks),
-                ete: values.ete * (maxMarks.ete / totalMaxMarks)
-            };
-
-            const totalMarks = weightedValues.attendance + weightedValues.ca + 
-                weightedValues.mtt + weightedValues.ete;
-            
-            const isOverallPassing = totalMarks >= 40;
-            let passed = false;
-            let failReasonsList = [];
-            let requiredMarks = '';
-
-            if (!isOverallPassing) {
-                failReasonsList.push(`• Overall marks (${totalMarks.toFixed(1)}%) are below required 40%`);
+            if (!etePass && !combinedPass) {
+                failReasonsList.push(
+                    `• Neither ETE marks (${values.ete.toFixed(1)}%) reach 30% nor ` +
+                    `MTT+ETE combined (${mttEteCombinedPercentage.toFixed(1)}%) reach 30%`
+                );
             }
 
+            passed = (totalMarks >= 40) && (etePass || combinedPass);
+        } else {
+            const etePass = values.ete >= 30;
+
+            if (!etePass) {
+                failReasonsList.push(`• ETE marks (${values.ete.toFixed(1)}%) are below required 30%`);
+            }
+
+            passed = (totalMarks >= 40) && etePass;
+        }
+
+        if (!passed) {
             if (courseType === 'theory') {
-                const etePass = values.ete >= 30;
-                const mttEteCombined = (values.mtt + values.ete) / 2;
-                const combinedPass = mttEteCombined >= 30;
-
-                if (!etePass && !combinedPass) {
-                    failReasonsList.push(
-                        `• Neither ETE marks (${values.ete.toFixed(1)}%) reach 30% nor ` +
-                        `MTT+ETE combined (${mttEteCombined.toFixed(1)}%) reach 30%`
-                    );
-                    
-                    const marksNeededForETE = Math.max(30 - values.ete, 0);
-                    const actualEteMarksNeeded = (marksNeededForETE * maxMarks.ete) / 100;
-                    
-                    requiredMarks = `To pass, you need either:<br>
-                    • ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete})<br>
-                    OR<br>
-                    • Improve MTT+ETE combined score to reach 30%`;
-                }
-
-                passed = isOverallPassing && (etePass || combinedPass);
+                const marksNeededForETE = Math.max(30 - values.ete, 0);
+                const actualEteMarksNeeded = (marksNeededForETE * maxMarks.ete) / 100;
+                
+                requiredMarks = `To pass, you need:<br>
+                • Overall marks to reach at least 40%<br>
+                • Either ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete})<br>
+                OR<br>
+                • Improve MTT+ETE combined score to reach 30%`;
             } else {
-                if (values.ete < 30) {
-                    failReasonsList.push(`• ETE marks (${values.ete.toFixed(1)}%) are below required 30%`);
-                    
-                    const marksNeededForETE = Math.max(30 - values.ete, 0);
-                    const actualEteMarksNeeded = (marksNeededForETE * maxMarks.ete) / 100;
-                    requiredMarks = `To pass, you need:<br>
-                    • ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete})`;
-                }
-                passed = isOverallPassing && values.ete >= 30;
+                const marksNeededForETE = Math.max(30 - values.ete, 0);
+                const actualEteMarksNeeded = (marksNeededForETE * maxMarks.ete) / 100;
+                
+                requiredMarks = `To pass, you need:<br>
+                • Overall marks to reach at least 40%<br>
+                • ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete})`;
             }
-
-            if (!isOverallPassing) {
-                const neededOverall = 40 - totalMarks;
-                const actualEteMarksNeeded = ((neededOverall * maxMarks.ete) / 
-                    (maxMarks.ete / totalMaxMarks))/100;
-                requiredMarks += `${requiredMarks ? '<br><br>' : ''}
-                • You need ${actualEteMarksNeeded.toFixed(1)} more marks in ETE (out of ${maxMarks.ete}) 
-                to reach overall 40%`;
-            }
-
-            resultContainer.style.display = 'block';
-            document.getElementById('result').textContent = passed ? 'PASSED! 🎉' : 'FAILED 😢';
-            document.getElementById('result').className = 'result ' + (passed ? 'pass' : 'fail');
-            document.getElementById('marks').textContent = `Total Marks: ${totalMarks.toFixed(1)}%`;
-            
-            if (!passed) {
-                failReasons.style.display = 'block';
-                failReasons.innerHTML = `
-                    <strong>Reasons for Failure:</strong><br>
-                    ${failReasonsList.join('<br>')}
-                    ${requiredMarks ? '<br><br><strong>What you need to pass:</strong><br>' + 
-                    requiredMarks : ''}
-                `;
-            } else {
-                failReasons.style.display = 'none';
-            }
-            document.getElementById('message').textContent = passed ? 
-                getRandomMessage(passMessages) : 
-                getRandomMessage(failMessages);
         }
 
-        checkButton.addEventListener('click', calculateResult);
+        resultContainer.style.display = 'block';
+        document.getElementById('result').textContent = passed ? 'PASSED! 🎉' : 'FAILED 😢';
+        document.getElementById('result').className = 'result ' + (passed ? 'pass' : 'fail');
+        document.getElementById('marks').textContent = `Total Marks: ${totalMarks.toFixed(1)}%`;
+        
+        if (!passed) {
+            failReasons.style.display = 'block';
+            failReasons.innerHTML = `
+                <strong>Reasons for Failure:</strong><br>
+                ${failReasonsList.join('<br>')}
+                ${requiredMarks ? '<br><br><strong>What you need to pass:</strong><br>' + requiredMarks : ''}
+            `;
+        } else {
+            failReasons.style.display = 'none';
+        }
+        
+        document.getElementById('message').textContent = passed ? 
+            getRandomMessage(passMessages) : 
+            getRandomMessage(failMessages);
+    }
+
+    checkButton.addEventListener('click', calculateResult);
+});
     </script>
 </body>
 </html>
